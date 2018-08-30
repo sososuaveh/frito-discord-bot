@@ -32,10 +32,11 @@ module.exports = {
                         echo(helperArgs);
                         break;
                     case 'roll':
-                        rollDice(helperArgs);
+                        rollCommand(helperArgs);
                         break;
                     default:
-                        bot.sendMessage({to: channelID, message: 'Unknown command.'});
+                        /* bot.sendMessage({to: channelID, message: 'Unknown command.'}); */
+                        break;
                 }
             }
         });
@@ -66,33 +67,15 @@ function echo(args){
     });
 }
 
-function rollDice(args){
+function rollCommand(args){
     try {
-        let specs = args.message.split(/[ ,]+/);  // split by comma or whitespace
-
+        let rolls = rollDice(args);
         let lines = [];
-        // Loop through the dice specification
-        for (let i = 0; i < specs.length; i++) {
-            let total = 0;
-            let rolls = [];
-            let parts = specs[i].split(/[dD]+/);
-            let numDie = parts[0];
-            let dieSize = parts[1];
 
-            for (let j = 0; j < numDie; j++) {
-                if (dieSize < 1) {
-                    rolls.push(0);
-                } else if (dieSize < 2) {
-                    rolls.push(1);
-                    total += 1;
-                } else {
-                    let roll = Math.floor(Math.random() * dieSize) + 1;
-                    rolls.push(roll);
-                    total += roll;
-                }
-            }
-
-            lines.push(specs[i] + ': ' + rolls.join(' + ') + ' = ' + total);
+        for (let spec in rolls) {
+            let data = rolls[spec];
+            let total = data.reduce(function(tot, num){ return tot + num; });
+            lines.push(spec + ': ' + data.join(' + ') + ' = ' + total);
         }
 
         args.bot.sendMessage({
@@ -109,6 +92,37 @@ function rollDice(args){
         console.log("ERROR: " + errorId);
         console.log(e);
     }
+}
+
+function rollDice(args) {
+    let rolls = {};
+    let specs = args.message.split(/[ ,]+/);  // split by comma or whitespace
+
+    // Loop through the dice specification
+    for (let i = 0; i < specs.length; i++) {
+        let total = 0;
+        let internalRolls = [];
+        let parts = specs[i].split(/[dD]+/);
+        let numDie = parts[0];
+        let dieSize = parts[1];
+
+        for (let j = 0; j < numDie; j++) {
+            if (dieSize < 1) {
+                internalRolls.push(0);
+            } else if (dieSize < 2) {
+                internalRolls.push(1);
+                total += 1;
+            } else {
+                let roll = Math.floor(Math.random() * dieSize) + 1;
+                internalRolls.push(roll);
+                total += roll;
+            }
+        }
+
+        rolls[specs[i]] = internalRolls;
+    }
+
+    return rolls;
 }
 
 function guid() {
