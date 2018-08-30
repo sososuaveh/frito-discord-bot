@@ -1,0 +1,11 @@
+{
+  "name": "frito-discord-bot",
+  "version": "0.0.1",
+  "description": "https://github.com/fritogotlayed/frito-discord-bot",
+  "main": "bot.js",
+  "author": "Frito",
+  "dependencies": {
+    "discord.io": "^2.5.3",
+    "winston": "^3.0.0"
+  }
+}
