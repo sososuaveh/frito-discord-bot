@@ -1,8 +1,8 @@
-var Discord = require('discord.io');
+let Discord = require('discord.io');
 
-var logger = require('winston');
-var auth = require('./config/auth.json');
-var botEvents = require('./bot-events.js');
+let logger = require('winston');
+let auth = require('./config/auth.json');
+let botEvents = require('./bot-events.js');
 
 
 // Configure logger settings
@@ -14,7 +14,7 @@ logger.level = 'debug';
 
 
 // Initialize Discord Bot
-var bot = new Discord.Client({
+let bot = new Discord.Client({
     token: auth.token,
     autorun: false
 });
