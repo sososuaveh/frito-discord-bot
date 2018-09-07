@@ -162,7 +162,7 @@ describe("bot-command-handlers", function() {
             handlers.roll(args);
 
             // Assert
-            assert(!sendMessageStub.called);
+            assert(sendMessageStub.called);
             let callArgs = sendMessageStub.getCall(0).args[0];
             assert.equal(callArgs.to, 3456);
             assert.equal(callArgs.message, "1d6: 2 = 2");
