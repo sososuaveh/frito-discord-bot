@@ -8,21 +8,9 @@ module.exports = {
 
     roll: function (args) {
         try {
-            // Check for only whitespace
-            //if (args.message.trim().length === 0){
-            //    return;
-            //}
 
             let messages = createRollMessages(args);
 
-//            for (let spec in rolls) {
-//                let data = rolls[spec];
-//                let total = data.reduce(function (tot, num) {
-//                    return tot + num;
-//                });
-//                lines.push(spec + ": " + data.join(" + ") + " = " + total);
-//            }
-//
             args.bot.sendMessage({
                 to: args.channelID,
                 message: messages.join("\n")
@@ -78,10 +66,10 @@ function rollResultMessage(spec, rolls){
     // spec['desc'] is the roll we are creating 
 
     // display messages:
-    // w2d10+1: 5, 7 => worst: 5  modified: 4
+    // w2d10+1: 5, 7 -> worst: 5  modified: 6
     // 2d6: 2 + 5 = 7
     // 2d10-1: 5 + 8 = 13 modified: 12
-    // b2d6: 2, 5 => best: 5
+    // b2d6: 2, 5 -> best: 5
 
 
     let total = rolls.reduce(function(tot, num) {
@@ -114,6 +102,11 @@ function rollResultMessage(spec, rolls){
         let modifier = Number(spec['modifier'] + spec['modAmount']);
         let modified = 0;
         modified = basevalue + modifier;
+
+        if (modified < 0 ){
+            modified = 0;
+        }
+
         message = message + ' modified: ' + modified;
     }
 
@@ -126,7 +119,8 @@ function rollSpecification(roll) {
 
     //create a specification of the dice roll
 
-    //a default die roll spec 1d6
+    //a default die roll spec 1d6 with no modifier and no worst/best option
+    
     let prefix = null;
     let numDie = 1;
     let dieSize = 6;
@@ -138,7 +132,7 @@ function rollSpecification(roll) {
     spec['numDie'] = numDie;
     spec['dieSize'] = dieSize;
     spec['modifier'] = modifier;
-    spec['modAmount'] = modAmount;
+    spec['modAmount'] = modAmount;  
     spec['desc'] = "";
 
     // Pattern for getting a single roll information;
@@ -146,7 +140,7 @@ function rollSpecification(roll) {
     // Can pick up a w or b as a prefix
     // can pick up or miss the first number(s) before  a "d" or "D" miss is default
     // can pick up or miss number(s) after a "d" or "D"  miss is default
-    // can pick up a modifier + or - as well as the amount 1 through 9
+    // can pick up a modifier + or - as well as the amount 0 through 9 
     
     let diePattern = /([wWbB])?(\d+)?[dD]+(\d+)?([+-])?(\d)?/;
     let rollInfo = [];
@@ -191,7 +185,7 @@ function rollSpecification(roll) {
 }
 
 function rollDice(numDie, dieSize) {
-    // the number of die (dice) to roll(numDie) that are of the same size (dieSize)
+    // the number of dice to roll <numDie> that are of the same size <dieSize>
     
     let rolls = [];
 
