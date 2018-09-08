@@ -28,21 +28,23 @@ module.exports = {
     },
 };
 
-
 function createRollMessages(args){
 
     let messages = [];
 
-    let separateDieRolls = args.message.split(/[ ,]+/); // split by comma or whitespace
+    let separateDieRolls = []
 
     // create a default specification roll if nothing sent to us
 
-    if (separateDieRolls.length === 0) {
+    if (args.message.trim().length === 0) {
         let spec = rollSpecification('');
         let rollResults = rollDice(spec['numDie'], spec['dieSize']);
-        let message = rollResultMessage(spec, rolllResults);
+        let message = rollResultMessage(spec, rollResults);
 
         messages.push(message);
+    }
+    else {
+        separateDieRolls = args.message.split(/[ ,]+/); // split by comma or whitespace
     }
 
     // loop through all the separate dice rolls
@@ -78,22 +80,22 @@ function rollResultMessage(spec, rolls){
 
     let best = Math.max.apply(null, rolls);
     let worst = Math.min.apply(null, rolls);
-    let basevalue = 0;
+    let baseValue = 0;
 
     if (spec['prefix'] === 'w' || spec['prefix'] === 'b') {
         message = message + rolls.join(', ') + ' -> ';
         if (spec['prefix'] === 'b'){
             message = message + 'best: ' + best;
-            basevalue = best;
+            baseValue = best;
         }
         else {
             message = message + 'worst: ' + worst;
-            basevalue = worst;
+            baseValue = worst;
         }
     }
     else {  // total is the default
         message = message + rolls.join (' + ') + ' = ' + total;
-        basevalue = total;
+        baseValue = total;
     }
    
     // create modified value if required
@@ -101,7 +103,7 @@ function rollResultMessage(spec, rolls){
     if (spec['modAmount'] > 0) {
         let modifier = Number(spec['modifier'] + spec['modAmount']);
         let modified = 0;
-        modified = basevalue + modifier;
+        modified = baseValue + modifier;
 
         if (modified < 0 ){
             modified = 0;
