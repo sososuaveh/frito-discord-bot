@@ -1,7 +1,7 @@
 const assert = require("assert");
 const sinon = require("sinon");
 
-const handlers = require("./bot-command-handlers.js");
+const handlers = require("../src/bot-command-handlers.js");
 
 describe("bot-command-handlers", function() {
     describe("#echo()", function() {
@@ -330,7 +330,41 @@ describe("bot-command-handlers", function() {
             assert.equal(callArgs.message, "w[2d6]-3: 2, 5 -> worst: 2 modified: 0");
         });
 
+        it("Should emit error message when an error occurrs.", function() {
+            // Arrange
+            let sendMessageStub = this.sandbox.stub();
+            let bot = {
+                sendMessage: sendMessageStub
+            };
+            let consoleStub = this.sandbox.stub(console);
+            let randomStub = this.sandbox.stub(Math, "random");
+            randomStub.onCall(0).returns(0.233238);
+            randomStub.onCall(1).returns(0.746827);
+            randomStub.onCall(2).returns(0.196835);
+            randomStub.onCall(3).returns(0.816854);
+            randomStub.onCall(4).returns(0.068496);
+            randomStub.onCall(5).returns(0.047205);
+            randomStub.onCall(6).returns(0.390546);
+            randomStub.onCall(7).returns(0.809345);
 
- 
+            // Act
+            let args = {
+                bot: bot,
+                user: "TestUser",
+                userID: 1234,
+                channelID: 3456,
+                message: 12
+            };
+            handlers.roll(args);
+
+            // Assert
+            assert.equal(sendMessageStub.called, true);
+            assert.equal(consoleStub.log.callCount, 2);
+            let callArgs = sendMessageStub.getCall(0).args[0];
+            assert.equal(callArgs.to, 3456);
+            assert.equal(
+                callArgs.message.startsWith("I had a problem figuring out what to do. Ask a mod to check the logs with this error ID: "),
+                true);
+        });
     });
 });

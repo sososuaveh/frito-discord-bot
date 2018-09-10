@@ -1,4 +1,6 @@
+.nyc_output/
 node_modules/
+coverage/
 
 auth.json
 *.log
